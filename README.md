@@ -83,16 +83,26 @@ also available through the junction `D:\UPM\embedded_hands_on`:
 ```powershell
 Set-Location D:\UPM\embedded_hands_on
 & D:\UPM\zephyrproject\.venv\Scripts\python.exe -m west build -b nucleo_wl55jc .
-& D:\UPM\zephyrproject\.venv\Scripts\python.exe -m west flash
+Set-Location D:\UPM\zephyrproject
+& D:\UPM\zephyrproject\.venv\Scripts\python.exe -m west flash `
+  -d D:\UPM\embedded_hands_on\build -r openocd --skip-rebuild `
+  --config D:\UPM\embedded_hands_on\openocd-nucleo-wl55jc.cfg
 ```
 
 The installed environment uses Zephyr 4.1.0 from `D:\UPM\zephyrproject` and
 the Zephyr SDK 0.17.0 from `D:\UPM\zephyr-sdk-0.17.0`. The user environment
 variables `ZEPHYR_BASE` and `ZEPHYR_SDK_INSTALL_DIR` are set accordingly.
 
-`west flash` uses the board's `stm32cubeprogrammer` runner. Install
-[STM32CubeProgrammer](https://www.st.com/stm32cubeprogrammer) separately from
-STMicroelectronics and add its `bin` directory to `PATH` before flashing.
+The project uses the installed xPack OpenOCD 0.12.0 runner. The project-local
+`openocd-nucleo-wl55jc.cfg` selects the current ST-LINK/SWD adapter syntax;
+Zephyr 4.1.0's board file still uses the older `hla_swd` syntax. OpenOCD is
+installed at `D:\UPM\xpack-openocd-0.12.0-7` and its `bin` directory is in the
+user `PATH`.
+
+[STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
+is an alternative STMicroelectronics flashing tool. It is not needed for the
+OpenOCD command above; if the board is flashed with CubeProgrammer instead,
+install it from ST and use the `stm32cubeprogrammer` runner.
 
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
