@@ -1,0 +1,13 @@
+# Zephyr build output
+build/
+
+# Local west and Python environments
+.west/
+.venv/
+__pycache__/
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store

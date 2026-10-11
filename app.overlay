@@ -1,0 +1,54 @@
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	aliases {
+		rgb-red = &rgb_red;
+		rgb-green = &rgb_green;
+		rgb-blue = &rgb_blue;
+	};
+
+	/*
+	 * The default wiring uses the three Nucleo user-LED GPIOs for the
+	 * external RGB LED channels.  The GPIO_ACTIVE_HIGH flags implement a
+	 * common-cathode RGB LED.  Change all three flags to GPIO_ACTIVE_LOW for
+	 * a common-anode LED.
+	 */
+	rgb_channels: rgb_channels {
+		compatible = "gpio-leds";
+
+		rgb_red: red {
+			gpios = <&gpiob 11 GPIO_ACTIVE_HIGH>;
+			label = "RGB red";
+		};
+
+		rgb_green: green {
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+			label = "RGB green";
+		};
+
+		rgb_blue: blue {
+			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
+			label = "RGB blue";
+		};
+	};
+
+	zephyr,user {
+		/* Arduino A0 = PB1 = ADC1_IN5 on NUCLEO-WL55JC. */
+		io-channels = <&adc1 5>;
+		io-channel-names = "brightness";
+	};
+};
+
+&adc1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@5 {
+		reg = <5>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+};

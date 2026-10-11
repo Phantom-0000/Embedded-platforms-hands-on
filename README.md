@@ -1,0 +1,96 @@
+# Embedded platforms hands on
+
+Zephyr RTOS brightness monitoring and control exercise for the
+STMicroelectronics NUCLEO-WL55JC1 board.
+
+## Scope
+
+The application implements three modes:
+
+| Mode | RGB output | ADC | B2 short press | B2 long press (>= 1 s) |
+| --- | --- | --- | --- | --- |
+| NORMAL | Red, yellow, or green from the LDR reading | One sample immediately on entry, then every 2 s | BLUE | OFF |
+| BLUE | Blue | Suspended | NORMAL | OFF |
+| OFF | Off | Suspended | NORMAL | Remains OFF |
+
+Brightness thresholds use the configured ADC full scale. Red is below 33%,
+yellow is 33% through 66% inclusive, and green is above 66%.
+
+## Hardware mapping
+
+The default `app.overlay` uses the following wiring:
+
+| Function | STM32WL pin | Board signal |
+| --- | --- | --- |
+| RGB red | PB11 | Nucleo LED3 / Arduino-compatible GPIO |
+| RGB green | PB9 | Nucleo LED2 / Arduino-compatible GPIO |
+| RGB blue | PB15 | Nucleo LED1 / Arduino-compatible GPIO |
+| LDR analog output | PB1, ADC1_IN5 | Arduino A0 |
+| B2 | PA1 | Zephyr alias `sw1` |
+
+The default RGB flags are active high for a common-cathode LED. If the actual
+LED is common anode, change the three RGB GPIO flags in `app.overlay` to
+`GPIO_ACTIVE_LOW` and connect the common pin to 3V3. Each external LED channel
+must have an appropriate series resistor. Set `LDR_BRIGHTNESS_INVERTED` to 1
+in `src/main.c` if the measured LDR voltage decreases as light increases.
+
+The NUCLEO-WL55JC board manual identifies B2 as PA1. The official MB1389
+schematic identifies the B2 circuit as switch B2 (KMR231GLFS), 100 nF
+capacitor C69 to ground, 1 kOhm series resistor R22, and ESD protection
+device U13 (ESDALC6V1-1U2). C69 and R22 form the input filtering/debouncing
+network; U13 protects the input.
+
+Sources:
+
+- [Zephyr Nucleo WL55JC board documentation](https://docs.zephyrproject.org/4.1.0/boards/st/nucleo_wl55jc/doc/nucleo_wl55jc.html)
+- [ST UM2592 NUCLEO-WL55JC user manual](https://www.st.com/resource/en/user_manual/dm00622917-stm32wl-nucleo64-board-mb1389-stmicroelectronics.pdf)
+- [ST MB1389 schematic pack](https://www.st.com/resource/en/schematic_pack/mb1389-wl55jc-highband-d04_schematic.pdf)
+
+## Thread architecture
+
+`main.c` is the control thread. It owns the mode state, ADC sampling, RGB
+updates, timing of the two-second sampling period, and serial output.
+
+`button.c` owns one additional thread, as required by the exercise. The B2
+interrupt callback writes raw press/release events to a `k_msgq`. The button
+thread converts those events into exactly one short or long action and writes
+the action to a second `k_msgq` consumed by `main.c`.
+
+The button thread emits the long action when the one-second deadline expires,
+without waiting for release. After a long action it consumes the later release
+without producing a short action. The hardware debounce network is therefore
+complemented by an explicit software state machine that handles event timing.
+
+## Build and flash
+
+This application targets Zephyr 4.1.0 and the `nucleo_wl55jc` board:
+
+```shell
+west build -b nucleo_wl55jc .
+west flash
+```
+
+The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
+port. The exact serial device name depends on the host operating system.
+
+## Expected serial output
+
+```text
+Brightness monitor started
+Mode: NORMAL; ADC period: 2000 ms
+ADC: raw=..., full_scale=4095, brightness=...%, color=...
+Mode: BLUE; ADC acquisition suspended
+Mode: OFF
+System OFF
+Mode: NORMAL; ADC acquisition resumed
+```
+
+## Verification checklist
+
+- NORMAL prints one ADC result at startup and approximately every two seconds.
+- Short presses switch NORMAL <-> BLUE; BLUE produces no ADC samples.
+- A press held for one second enters OFF immediately from NORMAL or BLUE.
+- Releasing a long press does not create a second short action.
+- A short press in OFF restores NORMAL and performs an immediate ADC sample.
+- Red/yellow/green decisions are checked on both sides of the 33% and 66%
+  thresholds.
