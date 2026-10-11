@@ -175,7 +175,7 @@ static int read_brightness(uint16_t *raw_value, uint32_t *full_scale)
 
 static enum brightness_color color_for_sample(uint16_t raw_value,
 					     uint32_t full_scale,
-					     uint32_t *percentage)
+					     uint32_t *percentage_x100)
 {
 	uint32_t adjusted = MIN((uint32_t)raw_value, full_scale);
 
@@ -183,7 +183,8 @@ static enum brightness_color color_for_sample(uint16_t raw_value,
 		adjusted = full_scale - adjusted;
 	}
 
-	*percentage = (adjusted * 100U) / full_scale;
+	/* Keep two decimal places in the log without using floating point. */
+	*percentage_x100 = (adjusted * 10000U + (full_scale / 2U)) / full_scale;
 
 	/* Compare rational percentages to preserve the exact 33/66 boundaries. */
 	if (adjusted * 100U < full_scale * 33U) {
@@ -199,7 +200,7 @@ static void sample_and_report(void)
 {
 	uint16_t raw_value;
 	uint32_t full_scale;
-	uint32_t percentage;
+	uint32_t percentage_x100;
 
 	int ret = read_brightness(&raw_value, &full_scale);
 	if (ret != 0) {
@@ -212,17 +213,18 @@ static void sample_and_report(void)
 	}
 
 	enum brightness_color color =
-		color_for_sample(raw_value, full_scale, &percentage);
+		color_for_sample(raw_value, full_scale, &percentage_x100);
 	ret = set_rgb_color(color);
 	if (ret != 0) {
 		printk("ERROR: RGB update failed (%d)\n", ret);
 		return;
 	}
 
-	printk("ADC: raw=%u, full_scale=%u, brightness=%u%%, color=%s\n",
+	printk("ADC: raw=%u, full_scale=%u, brightness=%u.%02u%%, color=%s\n",
 	       (unsigned int)raw_value,
 	       (unsigned int)full_scale,
-	       (unsigned int)percentage,
+	       (unsigned int)(percentage_x100 / 100U),
+	       (unsigned int)(percentage_x100 % 100U),
 	       brightness_color_name(color));
 }
 
