@@ -56,6 +56,12 @@ interrupt callback writes raw press/release events to a `k_msgq`. The button
 thread converts those events into exactly one short or long action and writes
 the action to a second `k_msgq` consumed by `main.c`.
 
+The Zephyr main thread keeps the default application priority. The button
+thread uses priority 5 and blocks on its raw-event queue, so it runs promptly
+when B2 changes but does not spin while the button is idle. The first queue
+carries timestamped GPIO edges; the second carries the short/long actions
+that are the only button information visible to `main.c`.
+
 The button thread emits the long action when the one-second deadline expires,
 without waiting for release. After a long action it consumes the later release
 without producing a short action. The hardware debounce network is therefore

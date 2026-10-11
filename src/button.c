@@ -82,6 +82,29 @@ static void report_dropped_events(void)
 	}
 }
 
+static void wait_for_release_after_long_press(void)
+{
+	for (;;) {
+		struct raw_button_event release;
+		int ret = k_msgq_get(&raw_button_msgq, &release, K_MSEC(50));
+
+		if (ret == 0) {
+			if (!release.pressed) {
+				return;
+			}
+			continue;
+		}
+
+		if (ret == -EAGAIN) {
+			/* Recover if the release edge was dropped when the queue was full. */
+			int state = gpio_pin_get_dt(&b2);
+			if (state <= 0) {
+				return;
+			}
+		}
+	}
+}
+
 static void button_thread_entry(void *unused_a, void *unused_b, void *unused_c)
 {
 	ARG_UNUSED(unused_a);
@@ -142,12 +165,7 @@ static void button_thread_entry(void *unused_a, void *unused_b, void *unused_c)
 
 		if (long_reported) {
 			/* Consume the eventual release without generating a short press. */
-			struct raw_button_event release;
-			while (k_msgq_get(&raw_button_msgq, &release, K_FOREVER) == 0) {
-				if (!release.pressed) {
-					break;
-				}
-			}
+			wait_for_release_after_long_press();
 		}
 	}
 }
