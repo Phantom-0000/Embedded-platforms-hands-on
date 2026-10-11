@@ -76,6 +76,20 @@ west build -b nucleo_wl55jc .
 west flash
 ```
 
+On Windows, keep the build checkout path free of spaces. Zephyr 4.1.0 splits
+the automatically discovered overlay path at spaces, so this repository is
+also available through the junction `D:\UPM\embedded_hands_on`:
+
+```powershell
+Set-Location D:\UPM\embedded_hands_on
+& D:\UPM\zephyrproject\.venv\Scripts\python.exe -m west build -b nucleo_wl55jc .
+& D:\UPM\zephyrproject\.venv\Scripts\python.exe -m west flash
+```
+
+The installed environment uses Zephyr 4.1.0 from `D:\UPM\zephyrproject` and
+the Zephyr SDK 0.17.0 from `D:\UPM\zephyr-sdk-0.17.0`. The user environment
+variables `ZEPHYR_BASE` and `ZEPHYR_SDK_INSTALL_DIR` are set accordingly.
+
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
 
