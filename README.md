@@ -105,7 +105,9 @@ OpenOCD command above; if the board is flashed with CubeProgrammer instead,
 the installed STM32CubeProgrammer CLI 2.15.0 is at
 `D:\UPM\STM32CubeProgrammer\bin` and is available on the user `PATH`; use the
 `stm32cubeprogrammer` runner. The package also contains the ST-LINK/VCP driver
-under `D:\UPM\STM32CubeProgrammer\Drivers\stsw-link009_v3`.
+under `D:\UPM\STM32CubeProgrammer\Drivers\stsw-link009_v3`; its three INF
+packages are preinstalled in the Windows Driver Store and will bind when the
+board is connected.
 
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
