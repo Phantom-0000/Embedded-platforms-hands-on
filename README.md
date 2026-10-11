@@ -90,6 +90,10 @@ The installed environment uses Zephyr 4.1.0 from `D:\UPM\zephyrproject` and
 the Zephyr SDK 0.17.0 from `D:\UPM\zephyr-sdk-0.17.0`. The user environment
 variables `ZEPHYR_BASE` and `ZEPHYR_SDK_INSTALL_DIR` are set accordingly.
 
+`west flash` uses the board's `stm32cubeprogrammer` runner. Install
+[STM32CubeProgrammer](https://www.st.com/stm32cubeprogrammer) separately from
+STMicroelectronics and add its `bin` directory to `PATH` before flashing.
+
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
 
