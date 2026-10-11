@@ -102,7 +102,10 @@ user `PATH`.
 [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
 is an alternative STMicroelectronics flashing tool. It is not needed for the
 OpenOCD command above; if the board is flashed with CubeProgrammer instead,
-install it from ST and use the `stm32cubeprogrammer` runner.
+the installed STM32CubeProgrammer CLI 2.15.0 is at
+`D:\UPM\STM32CubeProgrammer\bin` and is available on the user `PATH`; use the
+`stm32cubeprogrammer` runner. The package also contains the ST-LINK/VCP driver
+under `D:\UPM\STM32CubeProgrammer\Drivers\stsw-link009_v3`.
 
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
