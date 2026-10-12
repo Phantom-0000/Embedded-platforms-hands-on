@@ -112,6 +112,25 @@ board is connected.
 The board console uses LPUART1 at 115200 baud through the ST-LINK virtual COM
 port. The exact serial device name depends on the host operating system.
 
+## ADC setup troubleshooting
+
+If the serial console reports `brightness ADC channel setup failed (-22)`,
+check that `app.overlay` uses `zephyr,reference = "ADC_REF_INTERNAL"` for
+channel 5. The Zephyr 4.1.0 STM32 ADC driver rejects `ADC_REF_VDD_1` with
+`-EINVAL`, even though the application compiles. `ADC_REF_INTERNAL` is the
+driver's required reference setting; it does not change the LDR input to the
+internal VREFINT measurement channel. The LDR remains on PB1 / ADC1_IN5.
+
+After pulling an update, rebuild with `west build -p always -b nucleo_wl55jc .`
+and flash the newly built image. Confirm that the setup error disappears and
+that NORMAL prints `ADC: raw=...` approximately every two seconds. Vary the
+light on the LDR and check whether the raw readings change. If the readings
+change but RGB output does not, verify the RGB wiring and common-anode versus
+common-cathode GPIO flags separately. Hardware validation is still required.
+
+Driver source:
+[Zephyr 4.1.0 STM32 ADC](https://github.com/zephyrproject-rtos/zephyr/blob/v4.1.0/drivers/adc/adc_stm32.c).
+
 ## Expected serial output
 
 ```text
