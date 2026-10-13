@@ -14,6 +14,7 @@
 
 #define SAMPLE_PERIOD_MS 2000
 #define ADC_DEFAULT_RESOLUTION 12
+#define LDR_SENSITIVITY_PERCENT 200U
 
 /* Set to 1 after measuring a module whose voltage falls with light. */
 #define LDR_BRIGHTNESS_INVERTED 0
@@ -183,6 +184,15 @@ static enum brightness_color color_for_sample(uint16_t raw_value,
 	if (LDR_BRIGHTNESS_INVERTED != 0) {
 		adjusted = full_scale - adjusted;
 	}
+
+	/*
+	 * Keep the required 33%/66% color thresholds, but scale the sensor
+	 * response so an LDR module with a narrow voltage range can exercise all
+	 * three colors. 100 is neutral; 200 doubles the effective brightness and
+	 * clamps at the ADC full scale.
+	 */
+	adjusted = MIN((adjusted * LDR_SENSITIVITY_PERCENT + 50U) / 100U,
+			       full_scale);
 
 	/* Keep two decimal places in the log without using floating point. */
 	*percentage_x100 = (adjusted * 10000U + (full_scale / 2U)) / full_scale;
