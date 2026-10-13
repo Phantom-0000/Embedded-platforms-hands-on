@@ -22,16 +22,16 @@ The default `app.overlay` uses the following wiring:
 
 | Function | STM32WL pin | Board signal |
 | --- | --- | --- |
-| RGB red | PB11 | Nucleo LED3 / Arduino-compatible GPIO |
-| RGB green | PB9 | Nucleo LED2 / Arduino-compatible GPIO |
-| RGB blue | PB15 | Nucleo LED1 / Arduino-compatible GPIO |
+| Red output | PB11 | Nucleo LED3 / Arduino-compatible GPIO |
+| Green output | PB9 | Nucleo LED2 / Arduino-compatible GPIO |
+| Blue output | PB15 | Nucleo LED1 / Arduino-compatible GPIO |
 | LDR analog output | PB1, ADC1_IN5 | Arduino A0 |
 | B2 | PA1 | Zephyr alias `sw1` |
 
-The default RGB flags are now active low for a common-anode LED. Connect the
-common pin to 3V3. For a common-cathode LED, change the three RGB GPIO flags in
-`app.overlay` to `GPIO_ACTIVE_HIGH` and connect the common pin to GND. Each
-external LED channel must have an appropriate series resistor. Set
+The three board LEDs are independent active-high outputs; there is no common
+RGB LED pin to connect. PB11 is the board red LED, PB9 is green, and PB15 is
+blue. If an external RGB LED is added, use one resistor per color channel and
+configure its common-anode or common-cathode polarity separately. Set
 `LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
 decreases as light increases.
 

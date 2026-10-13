@@ -9,26 +9,24 @@
 	};
 
 	/*
-	 * The default wiring uses the three Nucleo user-LED GPIOs for the
-	 * external RGB LED channels.  The GPIO_ACTIVE_LOW flags implement a
-	 * common-anode RGB LED.  Change all three flags to GPIO_ACTIVE_HIGH for
-	 * a common-cathode LED.
+	 * Use the three independent Nucleo user LEDs. They are active high:
+	 * PB11 is red, PB9 is green, and PB15 is blue. There is no common LED pin.
 	 */
 	rgb_channels: rgb_channels {
 		compatible = "gpio-leds";
 
 		rgb_red: red {
-			gpios = <&gpiob 11 GPIO_ACTIVE_LOW>;
+			gpios = <&gpiob 11 GPIO_ACTIVE_HIGH>;
 			label = "RGB red";
 		};
 
 		rgb_green: green {
-			gpios = <&gpiob 9 GPIO_ACTIVE_LOW>;
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
 			label = "RGB green";
 		};
 
 		rgb_blue: blue {
-			gpios = <&gpiob 15 GPIO_ACTIVE_LOW>;
+			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
 			label = "RGB blue";
 		};
 	};
