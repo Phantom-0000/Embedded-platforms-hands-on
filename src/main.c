@@ -16,8 +16,8 @@
 #define ADC_DEFAULT_RESOLUTION 12
 #define LDR_SENSITIVITY_PERCENT 100U
 
-/* Set to 1 after measuring a module whose voltage falls with light. */
-#define LDR_BRIGHTNESS_INVERTED 0
+/* This divider's ADC voltage falls as the light level increases. */
+#define LDR_BRIGHTNESS_INVERTED 1
 
 enum app_mode {
 	MODE_NORMAL,
