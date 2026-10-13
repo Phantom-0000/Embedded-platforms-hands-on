@@ -16,8 +16,8 @@ The application implements three modes:
 Brightness thresholds use the configured ADC full scale. Red is below 33%,
 yellow is 33% through 66% inclusive, and green is above 66%. The source uses
 `LDR_SENSITIVITY_PERCENT` to scale the effective brightness before applying
-these required thresholds. It is currently `200` (double the measured value);
-`100` restores neutral scaling.
+these required thresholds. It is currently `100` (neutral scaling); increasing
+it amplifies the effective brightness for sensors with a narrow output range.
 
 ## Hardware mapping
 
@@ -132,11 +132,11 @@ light on the LDR and check whether the raw readings change. If the readings
 change but RGB output does not, verify the RGB wiring and common-anode versus
 common-cathode GPIO flags separately. Hardware validation is still required.
 
-To exercise all three colors with the current sensitivity setting, cover the
-LDR for RED, use normal room light for YELLOW, and use a phone flashlight for
-GREEN. If `raw` itself does not change when the light changes, sensitivity
-scaling cannot compensate for a wiring or sensor-output problem; connect the
-module's AO output to PB1 / Arduino A0 and check its 3.3 V and GND.
+With neutral scaling, cover the LDR for RED, use room light near the 33%
+boundary for YELLOW, and use a strong light for GREEN. If `raw` itself does
+not change when the light changes, sensitivity scaling cannot compensate for a
+wiring or sensor-output problem; connect the module's AO output to PB1 /
+Arduino A0 and check its 3.3 V and GND.
 
 Driver source:
 [Zephyr 4.1.0 STM32 ADC](https://github.com/zephyrproject-rtos/zephyr/blob/v4.1.0/drivers/adc/adc_stm32.c).

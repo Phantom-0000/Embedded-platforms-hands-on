@@ -14,7 +14,7 @@
 
 #define SAMPLE_PERIOD_MS 2000
 #define ADC_DEFAULT_RESOLUTION 12
-#define LDR_SENSITIVITY_PERCENT 200U
+#define LDR_SENSITIVITY_PERCENT 100U
 
 /* Set to 1 after measuring a module whose voltage falls with light. */
 #define LDR_BRIGHTNESS_INVERTED 0
