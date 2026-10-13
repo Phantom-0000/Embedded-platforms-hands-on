@@ -38,6 +38,10 @@ configure its common-anode or common-cathode polarity separately. Set
 `LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
 decreases as light increases.
 
+The ADC channel uses `ADC_ACQ_TIME_MAX` (160.5 STM32WL ADC cycles) because an
+LDR voltage divider can have high source impedance. The longer acquisition
+time lets the ADC sample-and-hold capacitor settle before the conversion.
+
 The NUCLEO-WL55JC board manual identifies B2 as PA1. The official MB1389
 schematic identifies the B2 circuit as switch B2 (KMR231GLFS), 100 nF
 capacitor C69 to ground, 1 kOhm series resistor R22, and ESD protection

@@ -47,7 +47,8 @@
 		zephyr,gain = "ADC_GAIN_1";
 		/* Required by Zephyr 4.1.0's STM32 ADC driver. */
 		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		/* LDR dividers are high impedance; use STM32WL's longest sample time. */
+		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
 		zephyr,resolution = <12>;
 	};
 };
