@@ -28,11 +28,12 @@ The default `app.overlay` uses the following wiring:
 | LDR analog output | PB1, ADC1_IN5 | Arduino A0 |
 | B2 | PA1 | Zephyr alias `sw1` |
 
-The default RGB flags are active high for a common-cathode LED. If the actual
-LED is common anode, change the three RGB GPIO flags in `app.overlay` to
-`GPIO_ACTIVE_LOW` and connect the common pin to 3V3. Each external LED channel
-must have an appropriate series resistor. Set `LDR_BRIGHTNESS_INVERTED` to 1
-in `src/main.c` if the measured LDR voltage decreases as light increases.
+The default RGB flags are now active low for a common-anode LED. Connect the
+common pin to 3V3. For a common-cathode LED, change the three RGB GPIO flags in
+`app.overlay` to `GPIO_ACTIVE_HIGH` and connect the common pin to GND. Each
+external LED channel must have an appropriate series resistor. Set
+`LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
+decreases as light increases.
 
 The NUCLEO-WL55JC board manual identifies B2 as PA1. The official MB1389
 schematic identifies the B2 circuit as switch B2 (KMR231GLFS), 100 nF
