@@ -31,12 +31,13 @@ The default `app.overlay` uses the following wiring:
 | LDR analog output | PB1, ADC1_IN5 | Arduino A0 |
 | B2 | PA1 | Zephyr alias `sw1` |
 
-The three board LEDs are independent active-high outputs; there is no common
-RGB LED pin to connect. PB11 is the board red LED, PB9 is green, and PB15 is
-blue. If an external RGB LED is added, use one resistor per color channel and
-configure its common-anode or common-cathode polarity separately. Set
-`LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
-decreases as light increases.
+The available external RGB LED is common-anode, so the RGB GPIOs use
+active-low logic. Connect its common anode to 3V3 and use one resistor per
+color channel. The external LED colors are correct, but the Nucleo's onboard
+LEDs are active-high on the same pins and therefore appear inverted. With only
+this common-anode LED, the two indicators cannot be synchronized without
+additional hardware. Set `LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the
+measured LDR voltage decreases as light increases.
 
 The ADC channel uses `ADC_ACQ_TIME_MAX` (160.5 STM32WL ADC cycles) because an
 LDR voltage divider can have high source impedance. The longer acquisition
