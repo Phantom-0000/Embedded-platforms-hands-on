@@ -167,3 +167,8 @@ Mode: NORMAL; ADC acquisition resumed
 - A short press in OFF restores NORMAL and performs an immediate ADC sample.
 - Red/yellow/green decisions are checked on both sides of the 33% and 66%
   thresholds.
+
+
+Name:
+Xianlong Tu
+Dhanashri Jasutkar
