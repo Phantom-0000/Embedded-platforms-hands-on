@@ -25,9 +25,9 @@ The default `app.overlay` uses the following wiring:
 
 | Function | STM32WL pin | Board connection |
 | --- | --- | --- |
-| External RGB red, through its own resistor | PB11 | CN10 pin 30; shared with onboard LED3 |
-| External RGB green, through its own resistor | PB9 | CN10 pin 26; shared with onboard LED2 |
-| External RGB blue, through its own resistor | PB15 | CN10 pin 28; shared with onboard LED1 |
+| External RGB red, through its own resistor | PB13 | CN10 pin 30; shared with onboard LED3 |
+| External RGB green, through its own resistor | PB15 | CN10 pin 26; shared with onboard LED2 |
+| External RGB blue, through its own resistor | PB14 | CN10 pin 28; shared with onboard LED1 |
 | Light sensor `S` (analog signal output) | PB1, ADC1_IN5 | CN8 pin 1: A0 |
 | B2 | PA1 | Onboard button; Zephyr alias `sw1` |
 
@@ -53,7 +53,7 @@ The available external RGB LED is common-anode, so the RGB GPIOs use
 active-low logic. Connect its common anode to the breadboard `+` power rail
 (3.3V) and use one resistor per color channel. The external LED colors are
 correct, but the Nucleo's onboard LEDs are active-high on the same pins and
-therefore appear inverted. With this shared PB11/PB9/PB15 wiring, software
+therefore appear inverted. With this shared PB13/PB14/PB15 wiring, software
 changes alone cannot make the two indicators display matching colors. Set
 `LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
 decreases as light increases.
