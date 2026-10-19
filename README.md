@@ -23,21 +23,40 @@ it amplifies the effective brightness for sensors with a narrow output range.
 
 The default `app.overlay` uses the following wiring:
 
-| Function | STM32WL pin | Board signal |
+| Function | STM32WL pin | Board connection |
 | --- | --- | --- |
-| Red output | PB11 | Nucleo LED3 / Arduino-compatible GPIO |
-| Green output | PB9 | Nucleo LED2 / Arduino-compatible GPIO |
-| Blue output | PB15 | Nucleo LED1 / Arduino-compatible GPIO |
-| LDR analog output | PB1, ADC1_IN5 | Arduino A0 |
-| B2 | PA1 | Zephyr alias `sw1` |
+| External RGB red, through its own resistor | PB11 | CN10 pin 30; shared with onboard LED3 |
+| External RGB green, through its own resistor | PB9 | CN10 pin 26; shared with onboard LED2 |
+| External RGB blue, through its own resistor | PB15 | CN10 pin 28; shared with onboard LED1 |
+| Light sensor `S` (analog signal output) | PB1, ADC1_IN5 | CN8 pin 1: A0 |
+| B2 | PA1 | Onboard button; Zephyr alias `sw1` |
+
+The working light sensor is a three-pin module labeled `S`, `+`, and `-`.
+In the tested breadboard layout, these pins are inserted at numbered positions
+5, 6, and 7 respectively. These are breadboard positions, not STM32 pin numbers.
+For each sensor pin, insert its jumper into another hole in the same connected
+five-hole group, on the same side of the breadboard's center gap.
+
+| From | To |
+| --- | --- |
+| Nucleo CN6 pin 4: 3.3V | Breadboard `+` power rail |
+| Nucleo CN6 pin 6 or 7: GND | Breadboard `-` power rail |
+| Sensor `S`, breadboard position 5 | Nucleo CN8 pin 1: A0 / PB1 |
+| Sensor `+`, breadboard position 6 | Breadboard `+` power rail |
+| Sensor `-`, breadboard position 7 | Breadboard `-` power rail |
+
+Keep both Nucleo-to-rail power wires connected while adding the sensor-to-rail
+jumpers. Connecting power to the rails alone does not power the sensor; its
+`+` and `-` pins must also connect to those rails.
 
 The available external RGB LED is common-anode, so the RGB GPIOs use
-active-low logic. Connect its common anode to 3V3 and use one resistor per
-color channel. The external LED colors are correct, but the Nucleo's onboard
-LEDs are active-high on the same pins and therefore appear inverted. With only
-this common-anode LED, the two indicators cannot be synchronized without
-additional hardware. Set `LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the
-measured LDR voltage decreases as light increases.
+active-low logic. Connect its common anode to the breadboard `+` power rail
+(3.3V) and use one resistor per color channel. The external LED colors are
+correct, but the Nucleo's onboard LEDs are active-high on the same pins and
+therefore appear inverted. With this shared PB11/PB9/PB15 wiring, software
+changes alone cannot make the two indicators display matching colors. Set
+`LDR_BRIGHTNESS_INVERTED` to 1 in `src/main.c` if the measured LDR voltage
+decreases as light increases.
 
 The ADC channel uses `ADC_ACQ_TIME_MAX` (160.5 STM32WL ADC cycles) because an
 LDR voltage divider can have high source impedance. The longer acquisition
@@ -138,10 +157,11 @@ change but RGB output does not, verify the RGB wiring and common-anode versus
 common-cathode GPIO flags separately. Hardware validation is still required.
 
 With neutral scaling, cover the LDR for RED, use room light near the 33%
-boundary for YELLOW, and use a strong light for GREEN. If `raw` itself does
-not change when the light changes, sensitivity scaling cannot compensate for a
-wiring or sensor-output problem; connect the module's AO output to PB1 /
-Arduino A0 and check its 3.3 V and GND.
+boundary for YELLOW, and use a strong light for GREEN. If `raw` does not follow
+the light or jumps randomly, check the module's `S` signal connection to CN8
+pin 1 (A0 / PB1) and both sensor power connections: `+` to the breadboard `+`
+rail (3.3V), and `-` to the breadboard `-` rail (GND). Sensitivity scaling cannot
+compensate for a wiring or sensor-output problem.
 
 Driver source:
 [Zephyr 4.1.0 STM32 ADC](https://github.com/zephyrproject-rtos/zephyr/blob/v4.1.0/drivers/adc/adc_stm32.c).
