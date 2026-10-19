@@ -3,6 +3,7 @@
 
 / {
 	aliases {
+		/* Names used by main.c for the three RGB channels. */
 		rgb-red = &rgb_red;
 		rgb-green = &rgb_green;
 		rgb-blue = &rgb_blue;
@@ -11,21 +12,25 @@
 	/*
 	 * External RGB LED is common-anode: PB11 is red, PB9 is green,
 	 * and PB15 is blue. The common anode connects to 3V3.
+	 * Active-low GPIO flags turn each color on when the pin is low.
 	 */
 	rgb_channels: rgb_channels {
 		compatible = "gpio-leds";
 
 		rgb_red: red {
+			/* Red channel on PB11. */
 			gpios = <&gpiob 11 GPIO_ACTIVE_LOW>;
 			label = "RGB red";
 		};
 
 		rgb_green: green {
+			/* Green channel on PB9. */
 			gpios = <&gpiob 9 GPIO_ACTIVE_LOW>;
 			label = "RGB green";
 		};
 
 		rgb_blue: blue {
+			/* Blue channel on PB15. */
 			gpios = <&gpiob 15 GPIO_ACTIVE_LOW>;
 			label = "RGB blue";
 		};
@@ -33,22 +38,27 @@
 
 	zephyr,user {
 		/* Arduino A0 = PB1 = ADC1_IN5 on NUCLEO-WL55JC. */
+		/* This is the LDR input used by the application. */
 		io-channels = <&adc1 5>;
 		io-channel-names = "brightness";
 	};
 };
 
 &adc1 {
+	/* Set the ADC channel used by the LDR. */
 	#address-cells = <1>;
 	#size-cells = <0>;
 
 	channel@5 {
+		/* Channel 5 is connected to the LDR voltage divider. */
 		reg = <5>;
+		/* Use a direct ADC gain. */
 		zephyr,gain = "ADC_GAIN_1";
 		/* Required by Zephyr 4.1.0's STM32 ADC driver. */
 		zephyr,reference = "ADC_REF_INTERNAL";
-		/* LDR dividers are high impedance; use STM32WL's longest sample time. */
+		/* A slow LDR divider needs more ADC sample time. */
 		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+		/* Use the 12-bit ADC range. */
 		zephyr,resolution = <12>;
 	};
 };
